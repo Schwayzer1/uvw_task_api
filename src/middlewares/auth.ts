@@ -23,3 +23,18 @@ export const authenticateJWT = (
     res.sendStatus(401);
   }
 };
+
+export const authorizeRoles =
+  (...allowedRoles: string[]) =>
+  (req: AuthRequest, res: Response, next: NextFunction): void => {
+    const userRole = req.user?.role;
+
+    if (!userRole || !allowedRoles.includes(userRole)) {
+      res
+        .status(403)
+        .json({ message: "Access denied: insufficient permissions" });
+      return;
+    }
+
+    next();
+  };
