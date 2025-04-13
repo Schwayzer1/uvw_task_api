@@ -13,7 +13,10 @@ const registerSchema = Joi.object({
   email: Joi.string().email().required(),
   name: Joi.string().required(),
   password: Joi.string().required(),
-  role: Joi.string().valid("Admin", "Manager", "Developer").required(),
+  role: Joi.string()
+    .valid("Admin", "Manager", "Developer")
+    .optional()
+    .default("Developer"),
 });
 
 export const registerUser = async (

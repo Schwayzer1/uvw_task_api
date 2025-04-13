@@ -3,6 +3,7 @@ import { authenticateJWT, authorizeRoles } from "../middlewares/auth";
 import {
   createTask,
   deleteTask,
+  getTaskLogs,
   getTasksByProject,
   updateTask,
 } from "../controllers/task.controller";
@@ -18,12 +19,7 @@ router.post(
 
 router.get("/", authenticateJWT, getTasksByProject);
 
-router.put(
-  "/:taskId",
-  authenticateJWT,
-  authorizeRoles("Admin", "Manager"),
-  updateTask
-);
+router.put("/:taskId", authenticateJWT, updateTask);
 
 router.delete(
   "/:taskId",
@@ -31,5 +27,7 @@ router.delete(
   authorizeRoles("Admin", "Manager"),
   deleteTask
 );
+
+router.get("/:taskId/logs", authenticateJWT, getTaskLogs);
 
 export default router;

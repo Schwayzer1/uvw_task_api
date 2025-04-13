@@ -3,6 +3,7 @@ import Joi from "joi";
 import Task from "../models/Task";
 import Project from "../models/Project";
 import { AuthRequest } from "../middlewares/auth";
+import TaskLog from "../models/TaskLog";
 
 const createTaskSchema = Joi.object({
   title: Joi.string().required(),
@@ -99,18 +100,45 @@ export const updateTask = async (
   }
 
   try {
+    const existingTask = await Task.findById(taskId);
+    if (!existingTask) {
+      res.status(404).json({ message: "Görev bulunamadı" });
+      return;
+    }
+
     const updatedTask = await Task.findByIdAndUpdate(taskId, req.body, {
       new: true,
     });
 
-    if (!updatedTask) {
-      res.status(404).json({ message: "Görev bulunamadı" });
-      return;
+    if (req.body.status && req.body.status !== existingTask.status) {
+      await TaskLog.create({
+        taskId: existingTask._id,
+        oldStatus: existingTask.status,
+        newStatus: req.body.status,
+        updatedBy: req.user!.userId,
+      });
     }
 
     res.status(200).json(updatedTask);
   } catch (err) {
     res.status(500).json({ message: "Görev güncellenemedi", error: err });
+  }
+};
+
+export const getTaskLogs = async (
+  req: AuthRequest,
+  res: Response
+): Promise<void> => {
+  const { taskId } = req.params;
+
+  try {
+    const logs = await TaskLog.find({ taskId })
+      .populate("updatedBy", "name email")
+      .sort({ updatedAt: -1 });
+
+    res.status(200).json(logs);
+  } catch (err) {
+    res.status(500).json({ message: "Görev geçmişi alınamadı", error: err });
   }
 };
 
