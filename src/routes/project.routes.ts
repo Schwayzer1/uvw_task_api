@@ -3,6 +3,7 @@ import {
   createProject,
   getUserProjects,
   getProjectById,
+  getAllProjects,
 } from "../controllers/project.controller";
 import { authenticateJWT, authorizeRoles } from "../middlewares/auth";
 
@@ -15,6 +16,7 @@ router.post(
   createProject
 );
 router.get("/", authenticateJWT, getUserProjects);
+router.get("/all", getAllProjects);
 router.get("/:id", authenticateJWT, getProjectById);
 
 export default router;
