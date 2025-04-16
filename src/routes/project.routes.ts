@@ -4,6 +4,7 @@ import {
   getUserProjects,
   getProjectById,
   getAllProjects,
+  deleteProject,
 } from "../controllers/project.controller";
 import { authenticateJWT, authorizeRoles } from "../middlewares/auth";
 
@@ -18,5 +19,11 @@ router.post(
 router.get("/", authenticateJWT, getUserProjects);
 router.get("/all", getAllProjects);
 router.get("/:id", getProjectById);
+router.put(
+  "/:projectId",
+  authenticateJWT,
+  authorizeRoles("Admin", "Manager"),
+  deleteProject
+);
 
 export default router;

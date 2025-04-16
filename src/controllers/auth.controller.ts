@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
 import Joi from "joi";
+import { AuthRequest } from "../middlewares/auth";
 
 const loginSchema = Joi.object({
   email: Joi.string().email().required(),
@@ -17,6 +18,10 @@ const registerSchema = Joi.object({
     .valid("Admin", "Manager", "Developer")
     .optional()
     .default("Developer"),
+});
+
+const roleSchema = Joi.object({
+  role: Joi.string().valid("Admin", "Manager", "Developer").required(),
 });
 
 export const registerUser = async (
@@ -36,7 +41,7 @@ export const registerUser = async (
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = await User.create({
+    await User.create({
       name,
       email,
       password: hashedPassword,
@@ -93,5 +98,35 @@ export const getAllUsers = async (req: Request, res: Response) => {
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch users", error });
+  }
+};
+
+export const updateUserRole = async (req: AuthRequest, res: Response) => {
+  const { userId } = req.params;
+  const { role } = req.body;
+
+  const { error } = roleSchema.validate({ role });
+  if (error) {
+    res.status(400).json({ error: error.details[0].message });
+    return;
+  }
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { role },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.status(200).json({
+      message: "User role updated successfully",
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Failed to update user role", error: err });
   }
 };

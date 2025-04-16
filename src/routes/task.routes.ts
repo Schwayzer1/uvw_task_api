@@ -21,8 +21,8 @@ router.get("/", authenticateJWT, getTasksByProject);
 
 router.put("/:taskId", authenticateJWT, updateTask);
 
-router.delete(
-  "/:taskId",
+router.put(
+  "/:taskId/delete",
   authenticateJWT,
   authorizeRoles("Admin", "Manager"),
   deleteTask
