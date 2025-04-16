@@ -17,6 +17,6 @@ router.post(
 );
 router.get("/", authenticateJWT, getUserProjects);
 router.get("/all", getAllProjects);
-router.get("/:id", authenticateJWT, getProjectById);
+router.get("/:id", getProjectById);
 
 export default router;

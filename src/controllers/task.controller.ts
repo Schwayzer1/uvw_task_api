@@ -29,13 +29,16 @@ export const createTask = async (
 ): Promise<void> => {
   const { projectId } = req.params;
 
+  if (!projectId) {
+    res.status(400).json({ message: "Project ID eksik" });
+    return;
+  }
+
   const { error } = createTaskSchema.validate(req.body);
   if (error) {
     res.status(400).json({ error: error.details[0].message });
     return;
   }
-
-  console.log(req.user.userId, "userIddddddd");
 
   try {
     const project = await Project.findOne({
@@ -68,7 +71,7 @@ export const getTasksByProject = async (
   try {
     const project = await Project.findOne({
       _id: projectId,
-      members: req.user!.userId,
+      isDelete: false,
     });
 
     if (!project) {
@@ -76,7 +79,7 @@ export const getTasksByProject = async (
       return;
     }
 
-    const tasks = await Task.find({ projectId }).populate(
+    const tasks = await Task.find({ projectId, isDelete: false }).populate(
       "assignedTo",
       "name email role"
     );
@@ -149,7 +152,7 @@ export const deleteTask = async (
   const { taskId } = req.params;
 
   try {
-    const deleted = await Task.findByIdAndDelete(taskId);
+    const deleted = await Task.findByIdAndUpdate(taskId, { isDelete: true });
     if (!deleted) {
       res.status(404).json({ message: "Görev bulunamadı" });
       return;

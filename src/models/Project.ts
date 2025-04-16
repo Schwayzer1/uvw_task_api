@@ -5,6 +5,7 @@ export interface IProject extends Document {
   description: string;
   createdBy: mongoose.Types.ObjectId;
   members: mongoose.Types.ObjectId[];
+  isDelete: boolean;
 }
 
 const ProjectSchema = new Schema<IProject>(
@@ -17,6 +18,7 @@ const ProjectSchema = new Schema<IProject>(
       required: true,
     },
     members: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    isDelete: { type: Boolean, default: false },
   },
   {
     timestamps: true,

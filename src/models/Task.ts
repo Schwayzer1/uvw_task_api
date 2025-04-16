@@ -10,6 +10,7 @@ export interface ITask extends Document {
   priority: TaskPriority;
   assignedTo?: mongoose.Types.ObjectId;
   projectId: mongoose.Types.ObjectId;
+  isDelete: boolean;
 }
 
 const TaskSchema = new Schema<ITask>(
@@ -37,6 +38,7 @@ const TaskSchema = new Schema<ITask>(
       ref: "Project",
       required: true,
     },
+    isDelete: { type: Boolean, default: false },
   },
   {
     timestamps: true,

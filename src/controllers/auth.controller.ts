@@ -86,3 +86,12 @@ export const loginUser = async (req: Request, res: Response): Promise<any> => {
     return res.status(500).json({ message: "Login failed", error: err });
   }
 };
+
+export const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch users", error });
+  }
+};
