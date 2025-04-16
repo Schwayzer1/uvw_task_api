@@ -150,7 +150,6 @@ export const deleteTask = async (
   res: Response
 ): Promise<void> => {
   const { taskId } = req.params;
-  console.log(taskId, "taskkkk");
   try {
     const deleted = await Task.findByIdAndUpdate(taskId, { isDelete: true });
 
